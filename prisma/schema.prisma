@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  email           String   @unique
+  hashed_password String
+  name            String
+  surname         String
+  about           String   @default("No description")
+  books           Book[]   @relation()
+  bookshelfs      Bookshelf[] @relation()
+  comments        Comment[]
+}
+
+model Bookshelf {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  userID String @db.ObjectId
+  user User @relation(fields: [userID], references: [id])
+
+  bookIDs String[] @db.ObjectId @default([])
+  books Book[] @relation(fields: [bookIDs], references: [id])
+}
+
+model Book {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  author        String
+  description   String
+  archive_url   String
+  userID        String @db.ObjectId
+  user          User @relation(fields: [userID], references: [id])
+
+  bookshelfIDs  String[] @db.ObjectId @default([])
+  bookshelfs    Bookshelf[] @relation(fields: [bookshelfIDs], references: [id])
+  
+  comments      Comment[]
+}
+
+model Comment {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  text     String
+  userID   String @db.ObjectId
+  user     User @relation(fields: [userID], references: [id])
+  
+  bookID   String @db.ObjectId
+  book     Book @relation(fields: [bookID], references: [id])
+}
