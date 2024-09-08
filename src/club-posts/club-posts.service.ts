@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBookDto } from './dto/create-book.dto';
+import { CreateClubPostDto } from './dto/create-club-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddCommentDto } from 'src/club-posts/dto/add-comment.dto';
+import { AddCommentDto } from './dto/add-comment.dto';
 
 @Injectable()
-export class BooksService {
+export class ClubPostsService {
   constructor(private prismaService: PrismaService) {}
 
   addComment(id: string, comment: AddCommentDto, userID: string) {
@@ -15,7 +15,7 @@ export class BooksService {
       },
     });
 
-    return this.prismaService.book.update({
+    return this.prismaService.clubPost.update({
       where: { id },
       data: {
         comments: {
@@ -28,30 +28,35 @@ export class BooksService {
     });
   }
 
-  create(createBookDto: CreateBookDto, userID: string) {
-    return this.prismaService.book.create({
+  create(createClubPostDto: CreateClubPostDto, userID: string) {
+    this.prismaService.user.update({
+      where: { id: userID },
       data: {
-        ...createBookDto,
-        user: {
-          connect: { id: userID },
-        },
+        score: { increment: 20 },
       },
     });
-  }
 
-  findTop() {
-    return this.prismaService.book.findMany({
-      take: 3,
-      orderBy: {
-        likedUsers: {
-          _count: 'desc',
+    if (!createClubPostDto.clubID) {
+      return this.prismaService.clubPost.create({
+        data: {
+          text: createClubPostDto.text,
+          title: createClubPostDto.title,
+          user: { connect: { id: userID } },
         },
+      });
+    }
+    return this.prismaService.clubPost.create({
+      data: {
+        text: createClubPostDto.text,
+        title: createClubPostDto.title,
+        club: { connect: { id: createClubPostDto.clubID } },
+        user: { connect: { id: userID } },
       },
     });
   }
 
   like(id: string, userID: string) {
-    return this.prismaService.book.update({
+    return this.prismaService.clubPost.update({
       where: { id },
       data: {
         likedUsers: {
@@ -62,7 +67,7 @@ export class BooksService {
   }
 
   unlike(id: string, userID: string) {
-    return this.prismaService.book.update({
+    return this.prismaService.clubPost.update({
       where: { id },
       data: {
         likedUsers: {
@@ -73,36 +78,24 @@ export class BooksService {
   }
 
   findAll() {
-    return this.prismaService.book.findMany();
+    return this.prismaService.clubPost.findMany();
   }
 
   findOne(id: string) {
-    return this.prismaService.book.findUnique({
+    return this.prismaService.clubPost.findUnique({
       where: { id },
       include: {
+        user: true,
         comments: {
-          include: {
-            user: true,
-          },
+          include: { user: true },
         },
       },
     });
   }
 
   remove(id: string) {
-    return this.prismaService.book.delete({
+    return this.prismaService.clubPost.delete({
       where: { id },
-    });
-  }
-
-  transferTo(id: string, userID: string) {
-    return this.prismaService.book.update({
-      where: { id },
-      data: {
-        user: {
-          connect: { id: userID },
-        },
-      },
     });
   }
 }

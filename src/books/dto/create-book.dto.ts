@@ -10,5 +10,5 @@ export class CreateBookDto {
   @IsNotEmpty()
   archive_url: string;
   @IsNotEmpty()
-  userID: string;
+  preview_url: string;
 }

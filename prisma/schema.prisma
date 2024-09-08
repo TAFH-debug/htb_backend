@@ -14,16 +14,28 @@ model User {
   name            String
   surname         String
   about           String   @default("No description")
-  books           Book[]   @relation()
+
+  score           Int      @default(0)
+  
+  books           Book[]   @relation("Books")
   bookshelfs      Bookshelf[] @relation()
-  comments        Comment[]
+
+  favoritesIDs    String[] @db.ObjectId @default([])
+  favorites       Book[]   @relation("Favorites", fields: [favoritesIDs], references: [id])
+
+  clubs           Club[]   @relation()
+  comments        Comment[] @relation()
+  clubPosts       ClubPost[] @relation("Author")
+
+  likedPostsIDs   String[] @db.ObjectId @default([])
+  likedPosts      ClubPost[] @relation("Liked", fields: [likedPostsIDs], references: [id])
 }
 
 model Bookshelf {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  userID String @db.ObjectId
-  user User @relation(fields: [userID], references: [id])
+  userID String? @db.ObjectId
+  user User? @relation(fields: [userID], references: [id])
 
   bookIDs String[] @db.ObjectId @default([])
   books Book[] @relation(fields: [bookIDs], references: [id])
@@ -34,22 +46,55 @@ model Book {
   title         String
   author        String
   description   String
+  preview_url   String
   archive_url   String
-  userID        String @db.ObjectId
-  user          User @relation(fields: [userID], references: [id])
+  userID        String? @db.ObjectId
+  user          User? @relation("Books", fields: [userID], references: [id])
+
+  likedUsersIDs      String[] @db.ObjectId
+  likedUsers         User[] @relation("Favorites", fields: [likedUsersIDs], references: [id])
 
   bookshelfIDs  String[] @db.ObjectId @default([])
   bookshelfs    Bookshelf[] @relation(fields: [bookshelfIDs], references: [id])
-  
-  comments      Comment[]
+  comments      Comment[] @relation()
 }
 
 model Comment {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  text     String
-  userID   String @db.ObjectId
-  user     User @relation(fields: [userID], references: [id])
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  text        String
+  userID      String? @db.ObjectId
+  user        User? @relation(fields: [userID], references: [id])
   
-  bookID   String @db.ObjectId
-  book     Book @relation(fields: [bookID], references: [id])
+  bookID      String? @db.ObjectId
+  book        Book? @relation(fields: [bookID], references: [id])
+
+  clubPostID  String? @db.ObjectId
+  clubPost    ClubPost? @relation(fields: [clubPostID], references: [id])
+}
+
+model Club {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  presidentID String? @db.ObjectId
+  president   User? @relation(fields: [presidentID], references: [id])
+  
+  clubPosts   ClubPost[] @relation()
+}
+
+model ClubPost {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  text        String
+  title       String
+  
+  clubID      String? @db.ObjectId
+  club        Club? @relation(fields: [clubID], references: [id])
+
+  userID      String? @db.ObjectId
+  user        User? @relation("Author", fields: [userID], references: [id])
+
+  likedIDs    String[] @db.ObjectId @default([])
+  likedUsers  User[] @relation("Liked", fields: [likedIDs], references: [id])
+
+  comments    Comment[] @relation()
 }

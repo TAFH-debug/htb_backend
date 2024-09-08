@@ -6,9 +6,21 @@ import { PrismaModule } from './prisma/prisma.module';
 import { BooksModule } from './books/books.module';
 import { BookshelfsModule } from './bookshelfs/bookshelfs.module';
 import { CommentsModule } from './comments/comments.module';
+import { ClubsModule } from './clubs/clubs.module';
+import { AuthModule } from './auth/auth.module';
+import { ClubPostsModule } from './club-posts/club-posts.module';
 
 @Module({
-  imports: [UsersModule, PrismaModule, BooksModule, BookshelfsModule, CommentsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    PrismaModule,
+    BooksModule,
+    BookshelfsModule,
+    CommentsModule,
+    ClubsModule,
+    ClubPostsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

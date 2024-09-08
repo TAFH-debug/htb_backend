@@ -6,14 +6,28 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BookshelfsService {
   constructor(private prismaService: PrismaService) {}
 
-  create(createBookshelfDto: CreateBookshelfDto) {
+  create(createBookshelfDto: CreateBookshelfDto, userID: string) {
     return this.prismaService.bookshelf.create({
-      data: createBookshelfDto,
+      data: {
+        name: createBookshelfDto.name,
+        user: {
+          connect: { id: userID },
+        },
+      },
+    });
+  }
+
+  findMy(userID: string) {
+    return this.prismaService.bookshelf.findMany({
+      where: { userID: userID },
+      include: { books: true },
     });
   }
 
   findAll() {
-    return this.prismaService.bookshelf.findMany();
+    return this.prismaService.bookshelf.findMany({
+      include: { books: true },
+    });
   }
 
   findOne(id: string) {

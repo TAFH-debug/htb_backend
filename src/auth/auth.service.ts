@@ -5,6 +5,11 @@ import { compare, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 
+const adminCredentials = {
+  email: 'admin@gmail.com',
+  password: 'password',
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -36,7 +41,17 @@ export class AuthService {
 
   async register(registerUserDto: RegisterUserDto) {
     const hashed_password = await hash(registerUserDto.password, 10);
+    registerUserDto.password = undefined;
+    return this.usersService.create({ ...registerUserDto, hashed_password });
+  }
 
-    return this.usersService.create(registerUserDto, hashed_password);
+  async adminLogin(loginUserDto: LoginUserDto) {
+    if (
+      loginUserDto.email === adminCredentials.email &&
+      loginUserDto.password === adminCredentials.password
+    ) {
+      return { ok: true };
+    }
+    throw new UnauthorizedException();
   }
 }

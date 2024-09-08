@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -8,6 +9,18 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/me')
+  findMe(@Req() req) {
+    return req.user;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/me-full')
+  findMeFull(@Req() req) {
+    return this.usersService.findOne(req.user.id);
   }
 
   @Get(':id')

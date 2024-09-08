@@ -1,6 +1,8 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateBookshelfDto {
+export class CreateClubDto {
   @IsNotEmpty()
   name: string;
+  @IsNotEmpty()
+  description: string;
 }

@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateBookshelfDto {
+export class AddCommentDto {
   @IsNotEmpty()
-  name: string;
+  text: string;
 }
