@@ -62,6 +62,11 @@ export class BooksController {
     return this.booksService.transferTo(id, updateBookDto.userID);
   }
 
+  @Delete(':id/transfer')
+  unattach(@Param('id') id: string) {
+    return this.booksService.unattach(id);
+  }
+
   @UseGuards(JwtGuard)
   @Patch(':id/add_comment')
   addComment(

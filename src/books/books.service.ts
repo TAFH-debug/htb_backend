@@ -105,4 +105,15 @@ export class BooksService {
       },
     });
   }
+
+  unattach(id: string) {
+    return this.prismaService.book.update({
+      where: { id },
+      data: {
+        user: {
+          disconnect: true,
+        },
+      },
+    });
+  }
 }

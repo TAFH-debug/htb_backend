@@ -9,6 +9,7 @@ import { CommentsModule } from './comments/comments.module';
 import { ClubsModule } from './clubs/clubs.module';
 import { AuthModule } from './auth/auth.module';
 import { ClubPostsModule } from './club-posts/club-posts.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClubPostsModule } from './club-posts/club-posts.module';
     CommentsModule,
     ClubsModule,
     ClubPostsModule,
+    ConfigModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
